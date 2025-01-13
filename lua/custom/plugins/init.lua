@@ -11,15 +11,26 @@ return {
     },
     config = function()
       local null_ls = require 'null-ls'
-      local formatting = null_ls.builtins.formatting -- to setup formatters
+      local formatting = null_ls.builtins.formatting   -- to setup formatters
       local diagnostics = null_ls.builtins.diagnostics -- to setup linters
+
+      local function get_sqlfluff_args()
+        local config_file = vim.fn.findfile('.sqlfluff', ';') -- Search for .sqlfluff in parent directories
+        if config_file ~= '' then
+          -- If .sqlfluff exists, use it
+          return {}
+        else
+          -- If .sqlfluff doesn't exist, default to postgres
+          return { '--dialect', 'postgres' }
+        end
+      end
 
       -- list of formatters & linters for mason to install
       require('mason-null-ls').setup {
         ensure_installed = {
           'checkmake',
           'prettier', -- ts/js formatter
-          'stylua', -- lua formatter
+          'stylua',   -- lua formatter
           'eslint_d', -- ts/js linter
           'shfmt',
           'ruff',
@@ -30,12 +41,12 @@ return {
 
       local sources = {
         diagnostics.checkmake,
-        diagnostics.sqlfluff.with { extra_args = { '--dialect', 'bigquery' } },
+        diagnostics.sqlfluff.with { extra_args = get_sqlfluff_args() },
         formatting.prettier.with { filetypes = { 'html', 'json', 'yaml', 'markdown' } },
         formatting.stylua,
         formatting.shfmt.with { args = { '-i', '4' } },
         formatting.terraform_fmt,
-        formatting.sqlfluff.with { extra_args = { '--dialect', 'bigquery' } },
+        formatting.sqlfluff.with { extra_args = get_sqlfluff_args() },
         require('none-ls.formatting.ruff').with { extra_args = { '--extend-select', 'I' } },
         require 'none-ls.formatting.ruff_format',
       }
