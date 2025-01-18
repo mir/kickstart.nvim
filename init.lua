@@ -424,6 +424,14 @@ require('lazy').setup({
             '^node_modules/', -- Ignore node_modules (optional)
             '^.venv/',        -- Ignore Python virtual environments (optional)
           },
+          mappings = {
+            i = {
+              ['<C-d>'] = require('telescope.actions').delete_buffer,
+            },
+            n = {
+              ['<C-d>'] = require('telescope.actions').delete_buffer,
+            },
+          },
         },
         -- pickers = {}
         pickers = {
